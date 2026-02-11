@@ -93,3 +93,44 @@
 .has-activities:hover {
   background: #2563eb !important;
 }
+
+/* Event indicators on calendar tiles */
+.event-indicator {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.more-indicator {
+  font-size: 10px;
+  color: #666;
+  margin-left: 2px;
+}
+
+/* Calendar tile hover effect */
+.react-calendar__tile:hover {
+  background: #f0f0f0 !important;
+}
+
+/* Selected date styling */
+.react-calendar__tile--active {
+  background: #3b82f6 !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Today's date */
+.react-calendar__tile--now {
+  background: #e0e7ff !important;
+  font-weight: bold;
+}

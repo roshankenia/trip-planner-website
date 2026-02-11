@@ -56,17 +56,7 @@ export const Navbar = () => {
       </Link>
       <div>
         {user ? (
-          <div className="flex justify-center items-center gap-1 md:gap-3">
-            <Link to={"/create-trip"}>
-              <Button variant="outline" className="rounded-full">
-                Create Trips
-              </Button>
-            </Link>
-            <Link to={"/my-trips"}>
-              <Button variant="outline" className="rounded-full">
-                My Trips
-              </Button>
-            </Link>
+          <div className="flex justify-center items-center gap-3">
             <Popover>
               <PopoverTrigger>
                 <img
@@ -74,13 +64,14 @@ export const Navbar = () => {
                   className="rounded-full h-[35px] w-[35px]"
                 />
               </PopoverTrigger>
-              <PopoverContent className="w-48 hover:bg-gray-100 cursor-pointer">
+              <PopoverContent className="w-48">
                 <h2
                   onClick={() => {
                     googleLogout();
                     localStorage.clear();
                     navigate("/");
                   }}
+                  className="hover:bg-gray-100 cursor-pointer p-2 rounded"
                 >
                   Logout
                 </h2>

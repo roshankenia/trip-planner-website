@@ -9,11 +9,12 @@ import { Toaster } from "./components/ui/sonner.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ViewTrip } from "./pages/view-trips/ViewTrip.jsx";
 import { MyTrips } from "./pages/my-trips/MyTrips.jsx";
+import { PersonalCalendar } from "./pages/calendar/PersonalCalendar.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <PersonalCalendar />,
   },
   {
     path: "/create-trip",
