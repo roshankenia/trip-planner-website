@@ -1,6 +1,5 @@
 import { Footer } from "@/components/common/Footer";
 import { Navbar } from "@/components/common/Navbar";
-import { HotelSection } from "@/components/view-trip/HotelSection";
 import { InfoSection } from "@/components/view-trip/InfoSection";
 import { VisitSection } from "@/components/view-trip/VisitSection";
 import { db } from "@/service/firebaseConfig";
@@ -33,8 +32,6 @@ export const ViewTrip = () => {
       <div className="p-10 md:px-20 lg:px-44 xl:px-56">
         {/* Information Section */}
         <InfoSection trip={tripData} />
-        {/* Hotels */}
-        <HotelSection trip={tripData} />
         {/* Daily plan */}
         <VisitSection trip={tripData} />
       </div>

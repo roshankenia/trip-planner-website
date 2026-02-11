@@ -8,7 +8,6 @@ import {
 } from "@/constants/options";
 import { chatSession } from "@/service/AIModal";
 import React, { useEffect, useState } from "react";
-import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -28,7 +27,6 @@ import { useNavigate } from "react-router-dom";
 
 export const CreateTrip = () => {
   const navigate = useNavigate();
-  const [place, setPlace] = useState();
   const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -58,16 +56,16 @@ export const CreateTrip = () => {
       return;
     }
 
-    if (formData?.noOfDays > 5 || formData?.noOfDays <= 0) {
+    if (!formData?.location) {
+      errorMessage = "Destination is required.";
+    } else if (!formData?.startDate) {
+      errorMessage = "Start date is required.";
+    } else if (formData?.noOfDays > 5 || formData?.noOfDays <= 0) {
       errorMessage = "Number of days should be between 1 and 5.";
-    } else {
-      if (!formData?.location) {
-        errorMessage = "Location is required.";
-      } else if (!formData?.budget) {
-        errorMessage = "Budget is required.";
-      } else if (!formData?.traveller) {
-        errorMessage = "Traveller details are required.";
-      }
+    } else if (!formData?.budget) {
+      errorMessage = "Budget is required.";
+    } else if (!formData?.traveller) {
+      errorMessage = "Traveller details are required.";
     }
 
     if (errorMessage) {
@@ -79,7 +77,7 @@ export const CreateTrip = () => {
 
     const FINAL_PROMPT = AI_PROMPT.replace(
       "{location}",
-      formData?.location?.label
+      formData?.location
     )
       .replace("{totalDays}", formData?.noOfDays)
       .replace("{traveler}", formData?.traveller)
@@ -115,6 +113,21 @@ export const CreateTrip = () => {
           plans: parsedTripData[1],
         };
       }
+
+      // Add actual dates to each day in itinerary
+      const startDate = new Date(formData.startDate);
+      console.log("Start date:", formData.startDate, "parsed:", startDate);
+      if (parsedTripData.itinerary) {
+        parsedTripData.itinerary = parsedTripData.itinerary.map((dayPlan, index) => {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(startDate.getDate() + index);
+          return {
+            ...dayPlan,
+            date: currentDate.toISOString().split('T')[0], // "2025-02-01" format
+          };
+        });
+      }
+      console.log("Trip data with dates:", parsedTripData);
     } catch (error) {
       console.error("Error parsing tripData:", error);
       toast("An error occurred while parsing the trip data.");
@@ -123,12 +136,15 @@ export const CreateTrip = () => {
     }
 
     try {
+      console.log("Saving to Firebase with docId:", docId);
+      console.log("User:", user);
       await setDoc(doc(db, "trips", docId), {
         userSelection: formData,
         tripData: parsedTripData,
         userEmail: user?.email,
         id: docId,
       });
+      console.log("Trip saved successfully!");
       setLoading(false);
       navigate(`/view-trip/${docId}`);
     } catch (error) {
@@ -174,15 +190,24 @@ export const CreateTrip = () => {
             <h2 className="text-xl my-3 font-medium">
               What is destination of choice? *️
             </h2>
-            <GooglePlacesAutocomplete
-              apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
-              selectProps={{
-                place,
-                onChange: (v) => {
-                  setPlace(v);
-                  handleInputChange("location", v);
-                },
-              }}
+            <Input
+              placeholder="Enter destination (e.g., Paris, Tokyo, New York)"
+              type="text"
+              value={formData?.location || ""}
+              onChange={(e) => handleInputChange("location", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-xl my-3 font-medium">
+              When does your trip start? *️
+            </h2>
+            <Input
+              placeholder="Select start date"
+              type="date"
+              min={new Date().toISOString().split('T')[0]}
+              value={formData?.startDate || ""}
+              onChange={(e) => handleInputChange("startDate", e.target.value)}
             />
           </div>
 

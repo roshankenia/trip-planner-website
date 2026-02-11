@@ -52,4 +52,4 @@ export const selectBudgetOptions = [
     }
 ]
 
-export const AI_PROMPT = 'Generate Travel Plan for Location : {location}, for {totalDays} Days for {traveler} with a {budget} budget ,Give me a Hotels options list in hotel as key with HotelName, Hotel address, Price, hotel image url, geo coordinates,rating, descriptions and give me itinerary as itinerary as key with placeName, placeDetails, Place Image Url, Geo Coordinates, ticket Pricing,  rating, Time travel each of the location for {totalDays} days with each day plan with best time to visit in json format.'
+export const AI_PROMPT = 'Generate Travel Plan for Location: {location}, for {totalDays} Days for {traveler} with a {budget} budget. Provide an itinerary in JSON format with the following structure: an array called "itinerary" where each element contains: "Day" (day number), and "Plan" (array of activities). Each activity should have: "Time" (e.g., "10:00 AM"), "PlaceName", "PlaceDetails", "PlaceImageUrl" (if available), "TicketPricing", "Rating", and "TimeTravel" (duration to spend there). Focus on creating a well-paced daily schedule with best times to visit each location.'

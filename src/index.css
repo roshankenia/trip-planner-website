@@ -67,3 +67,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Calendar custom styles */
+.react-calendar {
+  border: none !important;
+  font-family: inherit;
+  width: 100% !important;
+}
+
+.react-calendar__tile--active {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+.react-calendar__tile--now {
+  background: #e0e7ff !important;
+}
+
+.has-activities {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-radius: 4px;
+}
+
+.has-activities:hover {
+  background: #2563eb !important;
+}
