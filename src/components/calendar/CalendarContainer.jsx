@@ -3,24 +3,25 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 
-export const CalendarContainer = ({ selectedDate, onDateClick, eventsMap }) => {
-  // eventsMap: { "2026-02-15": [...events], "2026-02-16": [...events] }
-
+export const CalendarContainer = ({ selectedDate, onDateClick, outfitsMap }) => {
   const tileContent = ({ date }) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    const dayEvents = eventsMap[dateStr];
+    const dayOutfits = outfitsMap[dateStr];
 
-    if (dayEvents && dayEvents.length > 0) {
+    if (dayOutfits && dayOutfits.length > 0) {
+      const firstOutfit = dayOutfits[0];
+      const firstImage = firstOutfit.items?.[0]?.imageUrl;
+
       return (
-        <div className="event-indicator">
-          {dayEvents.slice(0, 3).map((event, idx) => (
-            <div
-              key={idx}
-              className="event-dot"
-              style={{ backgroundColor: event.color }}
-            />
-          ))}
-          {dayEvents.length > 3 && <span className="more-indicator">+{dayEvents.length - 3}</span>}
+        <div className="outfit-indicator">
+          {firstImage ? (
+            <img src={firstImage} alt="" className="outfit-thumbnail" />
+          ) : (
+            <div className="outfit-dot" />
+          )}
+          {dayOutfits.length > 1 && (
+            <span className="outfit-count">+{dayOutfits.length - 1}</span>
+          )}
         </div>
       );
     }

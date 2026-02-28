@@ -10,11 +10,16 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ViewTrip } from "./pages/view-trips/ViewTrip.jsx";
 import { MyTrips } from "./pages/my-trips/MyTrips.jsx";
 import { PersonalCalendar } from "./pages/calendar/PersonalCalendar.jsx";
+import { Wardrobe } from "./pages/wardrobe/Wardrobe.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <PersonalCalendar />,
+  },
+  {
+    path: "/wardrobe",
+    element: <Wardrobe />,
   },
   {
     path: "/create-trip",

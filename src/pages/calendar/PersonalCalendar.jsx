@@ -2,24 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from '../../components/common/Navbar';
 import { Footer } from '../../components/common/Footer';
 import { CalendarContainer } from '../../components/calendar/CalendarContainer';
-import { EventDetailsPanel } from '../../components/calendar/EventDetailsPanel';
-import { EventCreationModal } from '../../components/calendar/EventCreationModal';
-import { fetchEventsForMonth, saveEvent, updateEvent, deleteEvent } from '../../service/calendarService';
+import { OutfitDetailsPanel } from '../../components/calendar/OutfitDetailsPanel';
+import { OutfitCreationModal } from '../../components/calendar/OutfitCreationModal';
+import { fetchOutfitsForMonth, saveOutfit, updateOutfit, deleteOutfit } from '../../service/outfitService';
+import { fetchWardrobeItems, fetchCategories } from '../../service/wardrobeService';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 
 export const PersonalCalendar = () => {
-  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [eventsMap, setEventsMap] = useState({}); // { "2026-02-15": [...events] }
+  const [outfitsMap, setOutfitsMap] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null);
+  const [editingOutfit, setEditingOutfit] = useState(null);
+  const [wardrobeItems, setWardrobeItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Check authentication
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (!userData) {
@@ -30,111 +30,124 @@ export const PersonalCalendar = () => {
     setLoading(false);
   }, []);
 
-  // Load events for current month
+  // Load outfits for current month
   useEffect(() => {
     if (!user) return;
 
-    const loadEvents = async () => {
+    const loadOutfits = async () => {
       try {
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth() + 1;
-        const monthEvents = await fetchEventsForMonth(user.email, year, month);
+        const monthData = await fetchOutfitsForMonth(user.email, year, month);
 
-        // Convert to map: { "2026-02-15": [...events], ... }
         const map = {};
-        monthEvents.forEach(dayData => {
-          map[dayData.date] = dayData.events;
+        monthData.forEach(dayData => {
+          map[dayData.date] = dayData.outfits;
         });
-        setEventsMap(map);
+        setOutfitsMap(map);
       } catch (error) {
-        console.error('Error loading events:', error);
-        toast.error('Failed to load events');
+        console.error('Error loading outfits:', error);
+        toast.error('Failed to load outfits');
       }
     };
 
-    loadEvents();
+    loadOutfits();
   }, [user, currentMonth]);
+
+  // Load wardrobe items and categories (for outfit creation modal)
+  useEffect(() => {
+    if (!user) return;
+
+    const loadWardrobe = async () => {
+      try {
+        const [items, cats] = await Promise.all([
+          fetchWardrobeItems(user.email),
+          fetchCategories(user.email)
+        ]);
+        setWardrobeItems(items);
+        setCategories(cats);
+      } catch (error) {
+        console.error('Error loading wardrobe:', error);
+      }
+    };
+
+    loadWardrobe();
+  }, [user]);
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
   };
 
-  const handleAddEvent = () => {
-    setEditingEvent(null);
+  const handleAddOutfit = () => {
+    setEditingOutfit(null);
     setModalOpen(true);
   };
 
-  const handleEditEvent = (event) => {
-    setEditingEvent(event);
+  const handleEditOutfit = (outfit) => {
+    setEditingOutfit(outfit);
     setModalOpen(true);
   };
 
-  const handleDeleteEvent = async (event) => {
-    if (!window.confirm('Delete this event?')) return;
+  const handleDeleteOutfit = async (outfit) => {
+    if (!window.confirm('Delete this outfit?')) return;
 
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      await deleteEvent(user.email, dateStr, event.eventId);
+      await deleteOutfit(user.email, dateStr, outfit.outfitId);
 
-      // Update local state
-      const newEventsMap = { ...eventsMap };
-      newEventsMap[dateStr] = newEventsMap[dateStr].filter(e => e.eventId !== event.eventId);
-      if (newEventsMap[dateStr].length === 0) {
-        delete newEventsMap[dateStr];
+      const newMap = { ...outfitsMap };
+      newMap[dateStr] = newMap[dateStr].filter(o => o.outfitId !== outfit.outfitId);
+      if (newMap[dateStr].length === 0) {
+        delete newMap[dateStr];
       }
-      setEventsMap(newEventsMap);
+      setOutfitsMap(newMap);
 
-      toast.success('Event deleted');
+      toast.success('Outfit deleted');
     } catch (error) {
-      console.error('Error deleting event:', error);
-      toast.error('Failed to delete event');
+      console.error('Error deleting outfit:', error);
+      toast.error('Failed to delete outfit');
     }
   };
 
-  const handleSaveEvent = async (event) => {
+  const handleSaveOutfit = async (outfit) => {
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
-      if (editingEvent) {
-        // Update existing event
-        await updateEvent(user.email, dateStr, event.eventId, event);
+      if (editingOutfit) {
+        await updateOutfit(user.email, dateStr, outfit.outfitId, outfit);
 
-        // Update local state
-        const newEventsMap = { ...eventsMap };
-        const eventIndex = newEventsMap[dateStr].findIndex(e => e.eventId === event.eventId);
-        newEventsMap[dateStr][eventIndex] = event;
-        setEventsMap(newEventsMap);
+        const newMap = { ...outfitsMap };
+        const idx = newMap[dateStr].findIndex(o => o.outfitId === outfit.outfitId);
+        newMap[dateStr][idx] = outfit;
+        setOutfitsMap(newMap);
 
-        toast.success('Event updated');
+        toast.success('Outfit updated');
       } else {
-        // Create new event
-        await saveEvent(user.email, dateStr, event);
+        await saveOutfit(user.email, dateStr, outfit);
 
-        // Update local state
-        const newEventsMap = { ...eventsMap };
-        if (!newEventsMap[dateStr]) {
-          newEventsMap[dateStr] = [];
+        const newMap = { ...outfitsMap };
+        if (!newMap[dateStr]) {
+          newMap[dateStr] = [];
         }
-        newEventsMap[dateStr].push(event);
-        setEventsMap(newEventsMap);
+        newMap[dateStr].push(outfit);
+        setOutfitsMap(newMap);
 
-        toast.success('Event created');
+        toast.success('Outfit saved');
       }
     } catch (error) {
-      console.error('Error saving event:', error);
-      toast.error('Failed to save event');
+      console.error('Error saving outfit:', error);
+      toast.error('Failed to save outfit');
     }
   };
 
-  // If not logged in, show sign-in prompt
   if (!loading && !user) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center bg-gray-50">
           <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
-            <h1 className="text-3xl font-bold mb-4">Personal Calendar</h1>
-            <p className="text-gray-600 mb-6">Sign in with Google to start planning your days</p>
+            <h1 className="text-3xl font-bold mb-4">Outfit Planner</h1>
+            <p className="text-gray-600 mb-6">Sign in with Google to start planning your outfits</p>
           </div>
         </div>
         <Footer />
@@ -143,7 +156,7 @@ export const PersonalCalendar = () => {
   }
 
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
-  const selectedDateEvents = eventsMap[dateStr] || [];
+  const selectedDateOutfits = outfitsMap[dateStr] || [];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -151,39 +164,39 @@ export const PersonalCalendar = () => {
 
       <div className="flex-1 container mx-auto p-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">My Calendar</h1>
-          <p className="text-gray-600">Plan your days and stay organized</p>
+          <h1 className="text-3xl font-bold">Outfit Planner</h1>
+          <p className="text-gray-600">Plan your outfits for every day</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Calendar on the left */}
           <div>
             <CalendarContainer
               selectedDate={selectedDate}
               onDateClick={handleDateClick}
-              eventsMap={eventsMap}
+              outfitsMap={outfitsMap}
             />
           </div>
 
-          {/* Event details on the right */}
           <div>
-            <EventDetailsPanel
+            <OutfitDetailsPanel
               selectedDate={selectedDate}
-              events={selectedDateEvents}
-              onAddEvent={handleAddEvent}
-              onEditEvent={handleEditEvent}
-              onDeleteEvent={handleDeleteEvent}
+              outfits={selectedDateOutfits}
+              onAddOutfit={handleAddOutfit}
+              onEditOutfit={handleEditOutfit}
+              onDeleteOutfit={handleDeleteOutfit}
             />
           </div>
         </div>
       </div>
 
-      <EventCreationModal
+      <OutfitCreationModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         selectedDate={selectedDate}
-        onSave={handleSaveEvent}
-        editingEvent={editingEvent}
+        onSave={handleSaveOutfit}
+        editingOutfit={editingOutfit}
+        wardrobeItems={wardrobeItems}
+        categories={categories}
       />
 
       <Footer />

@@ -1,7 +1,15 @@
-export const EVENT_CATEGORIES = [
-  { id: 'personal', name: 'Personal', color: '#3498DB', icon: '👤' },
-  { id: 'work', name: 'Work', color: '#E74C3C', icon: '💼' },
-  { id: 'health', name: 'Health', color: '#2ECC71', icon: '🏥' },
-  { id: 'social', name: 'Social', color: '#F39C12', icon: '👥' },
-  { id: 'other', name: 'Other', color: '#95A5A6', icon: '📌' },
+export const DEFAULT_CLOTHING_CATEGORIES = [
+  { id: 'shirts', name: 'Shirts', icon: '👕', sortOrder: 0 },
+  { id: 'pants', name: 'Pants', icon: '👖', sortOrder: 1 },
+  { id: 'shoes', name: 'Shoes', icon: '👟', sortOrder: 2 },
+];
+
+export const OUTFIT_OCCASIONS = [
+  { id: 'morning', name: 'Morning', icon: '🌅' },
+  { id: 'afternoon', name: 'Afternoon', icon: '☀️' },
+  { id: 'evening', name: 'Evening', icon: '🌙' },
+  { id: 'formal', name: 'Formal', icon: '👔' },
+  { id: 'casual', name: 'Casual', icon: '😎' },
+  { id: 'workout', name: 'Workout', icon: '🏋️' },
+  { id: 'other', name: 'Other', icon: '📌' },
 ];

@@ -29,7 +29,6 @@ export const Navbar = () => {
   });
 
   const GetUserProfile = (tokenInfo) => {
-    console.log(tokenInfo);
     axios
       .get(
         `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,
@@ -41,7 +40,6 @@ export const Navbar = () => {
         }
       )
       .then((response) => {
-        console.log(response);
         localStorage.setItem("user", JSON.stringify(response.data));
         setOpenDailog(false);
         window.location.reload();
@@ -57,6 +55,12 @@ export const Navbar = () => {
       <div>
         {user ? (
           <div className="flex justify-center items-center gap-3">
+            <Link to="/">
+              <Button variant="ghost" size="sm">Calendar</Button>
+            </Link>
+            <Link to="/wardrobe">
+              <Button variant="outline" size="sm">My Wardrobe</Button>
+            </Link>
             <Popover>
               <PopoverTrigger>
                 <img

@@ -94,27 +94,40 @@
   background: #2563eb !important;
 }
 
-/* Event indicators on calendar tiles */
-.event-indicator {
+/* Outfit indicators on calendar tiles */
+.outfit-indicator {
   position: absolute;
-  bottom: 4px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 2px;
   align-items: center;
+  gap: 2px;
 }
 
-.event-dot {
-  width: 6px;
-  height: 6px;
+.outfit-thumbnail {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.outfit-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  background-color: #8b5cf6;
 }
 
-.more-indicator {
-  font-size: 10px;
+.outfit-count {
+  font-size: 9px;
   color: #666;
-  margin-left: 2px;
+  font-weight: bold;
+}
+
+/* Calendar tile - ensure relative positioning for indicators */
+.react-calendar__tile {
+  position: relative;
 }
 
 /* Calendar tile hover effect */
@@ -133,4 +146,64 @@
 .react-calendar__tile--now {
   background: #e0e7ff !important;
   font-weight: bold;
+}
+
+/* Wardrobe grid */
+.wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .wardrobe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wardrobe-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Clothing picker grid (inside modal) */
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.picker-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 4px;
+  transition: all 0.15s ease;
+}
+
+.picker-item:hover {
+  border-color: #d1d5db;
+}
+
+.picker-item.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* Image upload dropzone */
+.upload-dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.upload-dropzone:hover {
+  border-color: #3b82f6;
 }
